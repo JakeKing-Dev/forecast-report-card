@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Forecast Report Card</title>
+<meta name="description" content="Which weather forecast is actually right for your town? Every major forecast model, graded against what really happened over the last 30 days.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single graded "report card" column; search on top, ranked model rows, one chart, method notes. */
+:root{
+  --paper:#f3f5f6; --card:#ffffff; --ink:#15202b; --muted:#5b6b78; --rule:#d9e0e5;
+  --accent:#1f6f9c; --accent-soft:#e3eff6;
+  --a:#1d7a46; --b:#4f8a2b; --c:#a7791a; --d:#c2571b; --f:#b3261e;
+  --line-actual:#15202b; --line-best:#1f6f9c; --line-worst:#c2571b;
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0f171e; --card:#16212a; --ink:#e6edf2; --muted:#93a4b1; --rule:#26343f;
+  --accent:#6cb4dd; --accent-soft:#17303f;
+  --a:#4cc483; --b:#8fc45a; --c:#e0b24a; --d:#f08a4b; --f:#f26b61;
+  --line-actual:#e6edf2; --line-best:#6cb4dd; --line-worst:#f08a4b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f171e; --card:#16212a; --ink:#e6edf2; --muted:#93a4b1; --rule:#26343f;
+  --accent:#6cb4dd; --accent-soft:#17303f;
+  --a:#4cc483; --b:#8fc45a; --c:#e0b24a; --d:#f08a4b; --f:#f26b61;
+  --line-actual:#e6edf2; --line-best:#6cb4dd; --line-worst:#f08a4b; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:16px/1.55 var(--body);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:860px;margin:0 auto;padding-block:40px 64px;display:flex;flex-direction:column;gap:28px}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:.01em;text-wrap:balance;margin:0;line-height:1.05}
+h1{font-size:clamp(2.6rem,7vw,4rem);text-transform:uppercase}
+h2{font-size:1.7rem;text-transform:uppercase}
+.kicker{font:500 .78rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.lede{color:var(--muted);max-width:60ch;margin:10px 0 0}
+header{display:flex;flex-direction:column;gap:8px}
+form{display:flex;gap:8px;flex-wrap:wrap;position:relative}
+.field{flex:1 1 260px;position:relative;min-width:0}
+input[type=search]{width:100%;font:inherit;padding:12px 14px;border:1.5px solid var(--rule);border-radius:8px;background:var(--card);color:var(--ink)}
+input[type=search]:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+button{font:600 .95rem var(--body);padding:12px 18px;border-radius:8px;border:1.5px solid var(--accent);background:var(--accent);color:var(--card);cursor:pointer}
+button.ghost{background:transparent;color:var(--accent)}
+button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.suggest{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--card);border:1px solid var(--rule);border-radius:8px;z-index:5;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.suggest button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:0;color:var(--ink);font-weight:400;padding:10px 14px}
+.suggest button:hover,.suggest button:focus-visible{background:var(--accent-soft);outline:none}
+.suggest small{color:var(--muted)}
+.units{display:flex;gap:0;border:1.5px solid var(--rule);border-radius:8px;overflow:hidden}
+.units button{border:0;border-radius:0;background:var(--card);color:var(--muted);padding:12px 14px}
+.units button[aria-pressed="true"]{background:var(--ink);color:var(--card)}
+.place{display:flex;flex-direction:column;gap:2px}
+.place .name{font:700 2rem/1.1 var(--display);text-transform:uppercase}
+.place .meta{font:400 .85rem var(--mono);color:var(--muted)}
+.status{font:400 .9rem var(--mono);color:var(--muted)}
+.status.err{color:var(--f)}
+.winner{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:20px 22px;display:grid;grid-template-columns:auto 1fr;gap:6px 20px;align-items:center}
+.winner .grade{grid-row:span 2}
+.winner p{margin:0}
+.winner .head{font:600 1.15rem var(--body)}
+.winner .sub{color:var(--muted)}
+.grade{font:700 2.6rem/1 var(--display);width:64px;height:64px;border-radius:10px;display:grid;place-items:center;color:var(--card)}
+.g-A{background:var(--a)}.g-B{background:var(--b)}.g-C{background:var(--c)}.g-D{background:var(--d)}.g-F{background:var(--f)}
+.rows{display:flex;flex-direction:column;border-top:1px solid var(--rule)}
+.row{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--rule)}
+.row .grade{width:44px;height:44px;font-size:1.7rem;border-radius:8px}
+.row .who{min-width:0}
+.row .who b{display:block;font-weight:600}
+.row .who span{color:var(--muted);font-size:.88rem}
+.row .nums{display:flex;gap:18px;font:500 .95rem var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.row .nums div{display:flex;flex-direction:column;align-items:flex-end}
+.row .nums small{font:400 .68rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.rank{font:600 .8rem var(--mono);color:var(--muted)}
+.chartbox{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:18px 18px 10px}
+.chartbox svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font:400 .82rem var(--mono);color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:18px;height:3px;vertical-align:middle;margin-right:6px;border-radius:2px}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font:400 .88rem var(--mono);font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;border-bottom:1px solid var(--rule);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:500;color:var(--muted);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase}
+.method{color:var(--muted);font-size:.92rem;max-width:68ch}
+.method p{margin:0 0 10px}
+.method b{color:var(--ink);font-weight:600}
+footer{font:400 .8rem var(--mono);color:var(--muted);border-top:1px solid var(--rule);padding-top:16px;display:flex;flex-direction:column;gap:4px}
+footer a{color:var(--accent)}
+.skeleton{height:56px;border-radius:8px;background:linear-gradient(90deg,var(--rule),var(--card),var(--rule));background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skeleton{animation:none}}
+@media (max-width:560px){.row{grid-template-columns:40px minmax(0,1fr)}.row .nums{grid-column:2;justify-content:flex-start;text-align:left}.row .nums div{align-items:flex-start}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="kicker">Forecast Report Card</span>
+    <h1>Which forecast is right for your town?</h1>
+    <p class="lede">Every major weather model, graded against what actually happened over the last 30 days. Look up any town and see who you should trust.</p>
+  </header>
+
+  <form id="search" autocomplete="off" role="search">
+    <div class="field">
+      <label for="q" class="kicker" style="display:block;margin-bottom:6px">Town or city</label>
+      <input id="q" type="search" placeholder="e.g. Willits, Denver, Leeds" aria-autocomplete="list" aria-controls="sug">
+      <div id="sug" class="suggest" hidden></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:flex-end">
+      <button type="submit" id="go">Grade it</button>
+      <div class="units" role="group" aria-label="Units">
+        <button type="button" id="uF" aria-pressed="true">°F</button>
+        <button type="button" id="uC" aria-pressed="false">°C</button>
+      </div>
+    </div>
+  </form>
+
+  <section id="result" aria-live="polite">
+    <div class="place"><span class="name" id="pname">Willits, California</span><span class="meta" id="pmeta">Loading the last 30 days…</span></div>
+  </section>
+
+  <section id="winnerBox"></section>
+
+  <section>
+    <h2>The grades</h2>
+    <p class="status" id="gradeNote">Average miss on the daily high and low, forecast one day ahead.</p>
+    <div class="rows" id="rows">
+      <div class="skeleton"></div><div class="skeleton" style="margin-top:8px"></div><div class="skeleton" style="margin-top:8px"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Highs, forecast vs. reality</h2>
+    <div class="chartbox"><div id="chart"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The details</h2>
+    <p class="status">Average miss by how far ahead the forecast was made. Lower is better.</p>
+    <div class="tablewrap"><table id="detail"></table></div>
+  </section>
+
+  <section class="method">
+    <h2 style="color:var(--ink);margin-bottom:10px">How the grading works</h2>
+    <p><b>What gets graded.</b> For each of the last 30 full days, we take what each model predicted the day's high and low would be 1, 2 and 3 days beforehand, and whether it predicted rain.</p>
+    <p><b>What it's graded against.</b> Every model is compared with the same reference: Open-Meteo's historical weather record for that spot, the standard best estimate of what actually happened. Grading each model against its own later runs would let it mark its own homework.</p>
+    <p><b>The grade.</b> The letter is the average miss on the high and low one day ahead: A under 2°F (1.1°C), B under 3°F, C under 4°F, D under 5°F, F at 5°F or more. Rain is scored as the share of days the model correctly called wet (1 mm or more) or dry.</p>
+    <p><b>Limits.</b> The reference is itself a model-based estimate for a grid square, not your backyard thermometer, and it is built partly from European (ECMWF) data, which may slightly favor the ECMWF model. Thirty days is one season's worth of weather, not a permanent verdict, so grades can change as the weather does.</p>
+  </section>
+
+  <footer>
+    <span>Weather data by <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a>, licensed <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a>. Grades computed from that data.</span>
+    <span>Made by Jacob King · <a href="https://github.com/JakeKing-Dev" target="_blank" rel="noopener">github.com/JakeKing-Dev</a></span>
+  </footer>
+</main>
+
+<script>
+const MODELS = [
+  {id:"ecmwf_ifs025", name:"ECMWF", who:"European Centre (Europe)"},
+  {id:"gfs_seamless", name:"GFS", who:"NOAA (United States)"},
+  {id:"icon_seamless", name:"ICON", who:"Deutscher Wetterdienst (Germany)"},
+  {id:"gem_seamless", name:"GEM", who:"Environment Canada"},
+  {id:"ukmo_seamless", name:"UK Met Office", who:"Met Office (United Kingdom)"},
+  {id:"jma_seamless", name:"JMA", who:"Japan Meteorological Agency"},
+  {id:"meteofrance_seamless", name:"Météo-France", who:"Météo-France (France)"},
+];
+const LEADS = [1,2,3];
+const DAYS = 30;
+const RAIN_MM = 1.0;
+
+// ---------- pure scoring (no DOM, no network) ----------
+function dailyFromHourly(times, values){
+  // times are local ISO strings; returns {date: {max,min,sum,n}}
+  const out = {};
+  for (let i=0;i<times.length;i++){
+    const v = values ? values[i] : null;
+    if (v===null || v===undefined || Number.isNaN(v)) continue;
+    const d = times[i].slice(0,10);
+    const o = out[d] || (out[d] = {max:-Infinity,min:Infinity,sum:0,n:0});
+    if (v>o.max) o.max=v; if (v<o.min) o.min=v; o.sum+=v; o.n++;
+  }
+  return out;
+}
+function gradeFor(missF){
+  if (missF==null) return null;
+  return missF<2?"A":missF<3?"B":missF<4?"C":missF<5?"D":"F";
+}
+function scoreModels(prev, truth, dates, unitIsC){
+  // prev: previous-runs JSON; truth: archive JSON (daily max/min/precip)
+  const T = {};
+  truth.daily.time.forEach((d,i)=>{ T[d] = {max:truth.daily.temperature_2m_max[i], min:truth.daily.temperature_2m_min[i], rain:truth.daily.precipitation_sum[i]}; });
+  const H = prev.hourly, times = H.time;
+  const results = [];
+  for (const m of MODELS){
+    const r = {model:m, leads:{}, series:{}};
+    let any = false;
+    for (const k of LEADS){
+      const tk = H[`temperature_2m_previous_day${k}_${m.id}`];
+      const pk = H[`precipitation_previous_day${k}_${m.id}`];
+      if (!tk) continue;
+      const td = dailyFromHourly(times, tk), pd = pk ? dailyFromHourly(times, pk) : {};
+      let eh=0, el=0, n=0, rainOk=0, rainN=0; const s = {};
+      for (const d of dates){
+        const t = T[d], f = td[d];
+        if (!t || t.max==null || t.min==null || !f || f.n < 20) continue;
+        eh += Math.abs(f.max - t.max); el += Math.abs(f.min - t.min); n++;
+        s[d] = f.max;
+        const p = pd[d];
+        if (p && p.n >= 20 && t.rain!=null){ rainN++; if ((p.sum>=RAIN_MM) === (t.rain>=RAIN_MM)) rainOk++; }
+      }
+      if (n >= 10){
+        any = true;
+        r.leads[k] = {high:eh/n, low:el/n, both:(eh+el)/(2*n), days:n, rain: rainN ? rainOk/rainN : null, rainDays:rainN};
+        r.series[k] = s;
+      }
+    }
+    if (any && r.leads[1]){
+      const missF = unitIsC ? r.leads[1].both*9/5 : r.leads[1].both;
+      r.grade = gradeFor(missF);
+      results.push(r);
+    }
+  }
+  results.sort((a,b)=>a.leads[1].both - b.leads[1].both);
+  return {results, truth:T};
+}
+
+// ---------- network ----------
+function isoDate(d){ return d.toISOString().slice(0,10); }
+function windowDates(tzOffsetSec){
+  // last DAYS full local days, ending yesterday (local to the place)
+  const nowLocal = new Date(Date.now() + tzOffsetSec*1000);
+  const y = new Date(Date.UTC(nowLocal.getUTCFullYear(), nowLocal.getUTCMonth(), nowLocal.getUTCDate()-1));
+  const out = [];
+  for (let i=DAYS-1;i>=0;i--){ out.push(isoDate(new Date(y.getTime() - i*86400000))); }
+  return out;
+}
+async function getJSON(url){
+  const r = await fetch(url);
+  if (!r.ok) throw new Error(`The weather service answered ${r.status}. Try again in a minute.`);
+  const j = await r.json();
+  if (j.error) throw new Error(j.reason || "The weather service couldn't answer that request.");
+  return j;
+}
+async function fetchAll(lat, lon, unit){
+  const vars = [];
+  for (const k of LEADS){ vars.push(`temperature_2m_previous_day${k}`, `precipitation_previous_day${k}`); }
+  const u = unit==="C" ? "celsius" : "fahrenheit";
+  const prevURL = `https://previous-runs-api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`+
+    `&hourly=${vars.join(",")}&models=${MODELS.map(m=>m.id).join(",")}&past_days=${DAYS+2}&forecast_days=1&temperature_unit=${u}&timezone=auto`;
+  const prev = await getJSON(prevURL);
+  const dates = windowDates(prev.utc_offset_seconds||0);
+  const truthURL = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}`+
+    `&start_date=${dates[0]}&end_date=${dates[dates.length-1]}&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&temperature_unit=${u}&timezone=auto`;
+  const truth = await getJSON(truthURL);
+  return {prev, truth, dates};
+}
+async function geocode(q){
+  const j = await getJSON(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=6&language=en&format=json`);
+  return j.results || [];
+}
+
+// ---------- rendering ----------
+const $ = id => document.getElementById(id);
+let state = {place:{name:"Willits", admin1:"California", country:"United States", latitude:39.41, longitude:-123.36}, unit:"F"};
+try { const s = JSON.parse(localStorage.getItem("frc.state")||"null"); if (s && s.place) state = s; } catch(e){}
+function save(){ try{ localStorage.setItem("frc.state", JSON.stringify(state)); }catch(e){} }
+function deg(v){ return v==null ? "—" : `${v.toFixed(1)}°`; }
+function pct(v){ return v==null ? "—" : `${Math.round(v*100)}%`; }
+function placeLabel(p){ return [p.name, p.admin1, p.country].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i).join(", "); }
+function el(tag, attrs={}, text){ const e=document.createElement(tag); for(const k in attrs) e.setAttribute(k, attrs[k]); if(text!=null) e.textContent=text; return e; }
+
+function render(sc, dates){
+  const {results} = sc;
+  const U = state.unit==="C" ? "°C" : "°F";
+  const wb = $("winnerBox"); wb.replaceChildren();
+  const rows = $("rows"); rows.replaceChildren();
+  if (!results.length){
+    $("pmeta").textContent = "No forecast models have enough history here yet. Try a nearby larger town.";
+    $("chart").replaceChildren(); $("legend").replaceChildren(); $("detail").replaceChildren();
+    return;
+  }
+  const best = results[0], worst = results[results.length-1];
+  const box = el("div",{class:"winner"});
+  box.append(el("div",{class:`grade g-${best.grade}`, "aria-label":`Grade ${best.grade}`}, best.grade));
+  box.append(el("p",{class:"head"}, `${best.model.name} has been the most accurate forecast here.`));
+  const spread = worst.leads[1].both - best.leads[1].both;
+  box.append(el("p",{class:"sub"}, `A day ahead it missed the high and low by ${deg(best.leads[1].both)}${U.slice(1)} on average` +
+    (results.length>1 ? `, against ${deg(worst.leads[1].both)}${U.slice(1)} for ${worst.model.name}, the least accurate.` : ".")));
+  wb.append(box);
+
+  results.forEach((r,i)=>{
+    const row = el("div",{class:"row"});
+    row.append(el("div",{class:`grade g-${r.grade}`, "aria-label":`Grade ${r.grade}`}, r.grade));
+    const who = el("div",{class:"who"});
+    const b = el("b"); b.append(el("span",{class:"rank"}, `#${i+1} `)); b.append(document.createTextNode(r.model.name));
+    who.append(b, el("span",{}, r.model.who));
+    const nums = el("div",{class:"nums"});
+    const cell=(label,val)=>{ const d=el("div"); d.append(el("small",{},label)); d.append(el("span",{},val)); return d; };
+    nums.append(cell("High", deg(r.leads[1].high)), cell("Low", deg(r.leads[1].low)), cell("Rain right", pct(r.leads[1].rain)));
+    row.append(who, nums); rows.append(row);
+  });
+
+  // detail table
+  const t = $("detail"); t.replaceChildren();
+  const thead = el("thead"), tr = el("tr");
+  ["Model","1 day","2 days","3 days","Rain right (1 day)","Days graded"].forEach(h=>tr.append(el("th",{},h)));
+  thead.append(tr); t.append(thead);
+  const tb = el("tbody");
+  for (const r of results){
+    const row = el("tr");
+    row.append(el("td",{}, r.model.name));
+    for (const k of LEADS){ row.append(el("td",{}, r.leads[k] ? deg(r.leads[k].both) : "—")); }
+    row.append(el("td",{}, pct(r.leads[1].rain)));
+    row.append(el("td",{}, String(r.leads[1].days)));
+    tb.append(row);
+  }
+  t.append(tb);
+
+  drawChart(sc, dates, best, worst);
+}
+
+function drawChart(sc, dates, best, worst){
+  // Draw at the box's real width so labels stay readable on phones.
+  const W=Math.max(320, Math.round($("chart").clientWidth || 800)), H=W<500?240:300, P={l:44,r:12,t:12,b:30};
+  const pts = dates.map(d=>({d, a:sc.truth[d]?.max, b:best.series[1]?.[d], w:worst.series[1]?.[d]}));
+  const vals = pts.flatMap(p=>[p.a,p.b,p.w]).filter(v=>v!=null);
+  if (!vals.length){ $("chart").replaceChildren(); return; }
+  let lo=Math.floor(Math.min(...vals)/5)*5, hi=Math.ceil(Math.max(...vals)/5)*5; if (hi-lo<10){hi+=5;lo-=5;}
+  const x=i=>P.l + i*(W-P.l-P.r)/(dates.length-1), y=v=>P.t + (hi-v)*(H-P.t-P.b)/(hi-lo);
+  const NS="http://www.w3.org/2000/svg";
+  const svg=document.createElementNS(NS,"svg"); svg.setAttribute("viewBox",`0 0 ${W} ${H}`); svg.setAttribute("role","img");
+  svg.setAttribute("aria-label",`Daily highs for the last ${dates.length} days: what happened, and the one-day-ahead forecasts from ${best.model.name} and ${worst.model.name}.`);
+  const mk=(n,a)=>{const e=document.createElementNS(NS,n); for(const k in a) e.setAttribute(k,a[k]); return e;};
+  for (let v=lo; v<=hi; v+=5){
+    svg.append(mk("line",{x1:P.l,x2:W-P.r,y1:y(v),y2:y(v),stroke:"var(--rule)","stroke-width":1}));
+    const t=mk("text",{x:P.l-8,y:y(v)+4,"text-anchor":"end","font-size":12,"font-family":"var(--mono)",fill:"var(--muted)"}); t.textContent=`${v}°`; svg.append(t);
+  }
+  const step = W<500 ? 10 : 7;
+  dates.forEach((d,i)=>{ if ((i%step===0 && dates.length-1-i>=step/2) || i===dates.length-1){
+    const t=mk("text",{x:x(i),y:H-8,"text-anchor":i===dates.length-1?"end":i===0?"start":"middle","font-size":12,"font-family":"var(--mono)",fill:"var(--muted)"});
+    const dt=new Date(d+"T12:00:00Z"); t.textContent=dt.toLocaleDateString("en-US",{month:"short",day:"numeric",timeZone:"UTC"}); svg.append(t);} });
+  const path=(key,color,width,dash)=>{
+    let s="", pen=false;
+    pts.forEach((p,i)=>{ const v=p[key]; if(v==null){pen=false;return;} s+=(pen?"L":"M")+x(i).toFixed(1)+" "+y(v).toFixed(1)+" "; pen=true; });
+    const e=mk("path",{d:s,fill:"none",stroke:color,"stroke-width":width,"stroke-linejoin":"round","stroke-linecap":"round"});
+    if(dash) e.setAttribute("stroke-dasharray",dash); svg.append(e);
+  };
+  if (worst!==best) path("w","var(--line-worst)",2,"5 4");
+  path("b","var(--line-best)",2.5);
+  path("a","var(--line-actual)",2.5);
+  $("chart").replaceChildren(svg);
+  const lg=$("legend"); lg.replaceChildren();
+  const item=(c,t,dash)=>{const s=el("span"); const i=el("i"); i.style.background=c; if(dash){i.style.background=`repeating-linear-gradient(90deg,${c} 0 5px,transparent 5px 9px)`;} s.append(i, document.createTextNode(t)); lg.append(s);};
+  item("var(--line-actual)","What happened");
+  item("var(--line-best)",`${best.model.name}, 1 day ahead (best)`);
+  if (worst!==best) item("var(--line-worst)",`${worst.model.name}, 1 day ahead (least accurate)`,true);
+}
+
+async function run(){
+  const p = state.place;
+  $("pname").textContent = placeLabel(p);
+  $("pmeta").className = "meta"; $("pmeta").textContent = "Grading the last 30 days…";
+  $("rows").innerHTML = '<div class="skeleton"></div><div class="skeleton" style="margin-top:8px"></div><div class="skeleton" style="margin-top:8px"></div>';
+  $("winnerBox").replaceChildren();
+  try{
+    const {prev, truth, dates} = await fetchAll(p.latitude.toFixed(3), p.longitude.toFixed(3), state.unit);
+    const sc = scoreModels(prev, truth, dates, state.unit==="C");
+    $("pmeta").textContent = `${dates[0]} to ${dates[dates.length-1]} · ${sc.results.length} models graded · ${p.latitude.toFixed(2)}, ${p.longitude.toFixed(2)}`;
+    $("gradeNote").textContent = `Average miss on the daily high and low, forecast one day ahead, in ${state.unit==="C"?"°C":"°F"}.`;
+    render(sc, dates);
+  }catch(e){
+    $("pmeta").className = "meta status err";
+    $("pmeta").textContent = (e && e.message) ? e.message : "Couldn't reach the weather service. Check your connection and try again.";
+    $("rows").replaceChildren();
+  }
+}
+
+// search + suggestions
+let sugTimer=null, lastSug=[];
+$("q").addEventListener("input", ()=>{
+  clearTimeout(sugTimer);
+  const q=$("q").value.trim();
+  if (q.length<2){ $("sug").hidden=true; return; }
+  sugTimer=setTimeout(async()=>{
+    try{ lastSug = await geocode(q); }catch(e){ lastSug=[]; }
+    const s=$("sug"); s.replaceChildren();
+    if (!lastSug.length){ s.hidden=true; return; }
+    lastSug.forEach(r=>{ const b=el("button",{type:"button"}); b.append(document.createTextNode(r.name+" ")); b.append(el("small",{}, [r.admin1,r.country].filter(Boolean).join(", ")));
+      b.addEventListener("click",()=>{ pick(r); }); s.append(b); });
+    s.hidden=false;
+  },250);
+});
+function pick(r){ state.place={name:r.name, admin1:r.admin1, country:r.country, latitude:r.latitude, longitude:r.longitude}; save(); $("sug").hidden=true; $("q").value=""; run(); }
+$("search").addEventListener("submit", async e=>{
+  e.preventDefault();
+  const q=$("q").value.trim(); if(!q) return;
+  try{ const rs = lastSug.length ? lastSug : await geocode(q);
+    if (!rs.length){ $("pmeta").className="meta status err"; $("pmeta").textContent=`Couldn't find "${q}". Try the town's full name or a nearby city.`; return; }
+    pick(rs[0]);
+  }catch(err){ $("pmeta").className="meta status err"; $("pmeta").textContent=err.message; }
+});
+document.addEventListener("click", e=>{ if(!e.target.closest(".field")) $("sug").hidden=true; });
+function setUnit(u){ state.unit=u; save(); $("uF").setAttribute("aria-pressed", u==="F"); $("uC").setAttribute("aria-pressed", u==="C"); run(); }
+$("uF").addEventListener("click", ()=>setUnit("F"));
+$("uC").addEventListener("click", ()=>setUnit("C"));
+$("uF").setAttribute("aria-pressed", state.unit==="F"); $("uC").setAttribute("aria-pressed", state.unit==="C");
+
+if (typeof module !== "undefined") { module.exports = {scoreModels, dailyFromHourly, gradeFor, windowDates, MODELS}; }
+else run();
+</script>
+</body>
+</html>
