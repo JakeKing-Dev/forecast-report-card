@@ -108,7 +108,7 @@ footer a{color:var(--accent)}
   <form id="search" autocomplete="off" role="search">
     <div class="field">
       <label for="q" class="kicker" style="display:block;margin-bottom:6px">Town or city</label>
-      <input id="q" type="search" placeholder="e.g. Willits, Denver, Leeds" aria-autocomplete="list" aria-controls="sug">
+      <input id="q" type="search" placeholder="e.g. Seattle, Denver, Leeds" aria-autocomplete="list" aria-controls="sug">
       <div id="sug" class="suggest" hidden></div>
     </div>
     <div style="display:flex;gap:8px;align-items:flex-end">
@@ -121,7 +121,7 @@ footer a{color:var(--accent)}
   </form>
 
   <section id="result" aria-live="polite">
-    <div class="place"><span class="name" id="pname">Willits, California</span><span class="meta" id="pmeta">Loading the last 30 days…</span></div>
+    <div class="place"><span class="name" id="pname">Chicago, Illinois</span><span class="meta" id="pmeta">Loading the last 30 days…</span></div>
   </section>
 
   <section id="winnerBox"></section>
@@ -268,7 +268,7 @@ async function geocode(q){
 
 // ---------- rendering ----------
 const $ = id => document.getElementById(id);
-let state = {place:{name:"Willits", admin1:"California", country:"United States", latitude:39.41, longitude:-123.36}, unit:"F"};
+let state = {place:{name:"Chicago", admin1:"Illinois", country:"United States", latitude:41.85, longitude:-87.65}, unit:"F"};
 try { const s = JSON.parse(localStorage.getItem("frc.state")||"null"); if (s && s.place) state = s; } catch(e){}
 function save(){ try{ localStorage.setItem("frc.state", JSON.stringify(state)); }catch(e){} }
 function deg(v){ return v==null ? "—" : `${v.toFixed(1)}°`; }
