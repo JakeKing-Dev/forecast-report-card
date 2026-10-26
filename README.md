@@ -24,6 +24,17 @@ the daily high, low and rain over the last 30 days.
 backyard thermometer, and is built partly from ECMWF data, which may slightly
 favor that model. Thirty days is one season, not a permanent verdict.
 
+## Evolution Lab
+
+Below the grades, a genetic algorithm evolves 48 recipes for blending the
+models over 60 generations. Each recipe gives every model a share of trust
+and adds a correction to the high and low. Recipes are scored only on the
+first two-thirds of the month (practice); the last third stays sealed as an
+exam. The champion counts as trusted only if it beats the best single model
+on the exam and the 90% range of its improvement (by resampling exam days)
+stays above zero. The first run for each town and day is deterministic and is
+the official one; reruns are labeled as reruns.
+
 ## Running it
 
 It's one static HTML file with no build step and no server. Open

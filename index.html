@@ -15,6 +15,7 @@
   --accent:#1f6f9c; --accent-soft:#e3eff6;
   --a:#1d7a46; --b:#4f8a2b; --c:#a7791a; --d:#c2571b; --f:#b3261e;
   --line-actual:#15202b; --line-best:#1f6f9c; --line-worst:#c2571b;
+  --m1:#2f6fb0; --m2:#c2571b; --m3:#3f8f4f; --m4:#8a5cc2; --m5:#a9800f; --m6:#c23b7a; --m7:#23918d;
   --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
@@ -24,12 +25,14 @@
   --paper:#0f171e; --card:#16212a; --ink:#e6edf2; --muted:#93a4b1; --rule:#26343f;
   --accent:#6cb4dd; --accent-soft:#17303f;
   --a:#4cc483; --b:#8fc45a; --c:#e0b24a; --d:#f08a4b; --f:#f26b61;
-  --line-actual:#e6edf2; --line-best:#6cb4dd; --line-worst:#f08a4b; color-scheme:dark}}
+  --line-actual:#e6edf2; --line-best:#6cb4dd; --line-worst:#f08a4b;
+  --m1:#7fb0e6; --m2:#f08a4b; --m3:#7cc98a; --m4:#b99be8; --m5:#e3b84f; --m6:#ee82b3; --m7:#6fd1cd; color-scheme:dark}}
 :root[data-theme="dark"]{
   --paper:#0f171e; --card:#16212a; --ink:#e6edf2; --muted:#93a4b1; --rule:#26343f;
   --accent:#6cb4dd; --accent-soft:#17303f;
   --a:#4cc483; --b:#8fc45a; --c:#e0b24a; --d:#f08a4b; --f:#f26b61;
-  --line-actual:#e6edf2; --line-best:#6cb4dd; --line-worst:#f08a4b; color-scheme:dark}
+  --line-actual:#e6edf2; --line-best:#6cb4dd; --line-worst:#f08a4b;
+  --m1:#7fb0e6; --m2:#f08a4b; --m3:#7cc98a; --m4:#b99be8; --m5:#e3b84f; --m6:#ee82b3; --m7:#6fd1cd; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--paper);color:var(--ink);font:16px/1.55 var(--body);
@@ -94,6 +97,36 @@ footer a{color:var(--accent)}
 .skeleton{height:56px;border-radius:8px;background:linear-gradient(90deg,var(--rule),var(--card),var(--rule));background-size:200% 100%;animation:sh 1.2s infinite}
 @keyframes sh{to{background-position:-200% 0}}
 @media (prefers-reduced-motion:reduce){.skeleton{animation:none}}
+.lab{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:16px}
+.labbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.labstats{display:flex;gap:22px;flex-wrap:wrap;font:500 .95rem var(--mono);font-variant-numeric:tabular-nums}
+.labstats div{display:flex;flex-direction:column}
+.labstats small{font:400 .68rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.labctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.labctl button{padding:9px 14px;font-size:.88rem}
+.labctl label{font:400 .8rem var(--mono);color:var(--muted);display:flex;gap:6px;align-items:center}
+.labctl select{font:inherit;color:var(--ink);background:var(--card);border:1.5px solid var(--rule);border-radius:6px;padding:6px}
+#pop{display:block;width:100%;height:auto;border-radius:8px;background:var(--paper)}
+.labgrid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px}
+.champ{display:flex;flex-direction:column;gap:10px;min-width:0}
+.wbar{display:grid;grid-template-columns:7.5em minmax(0,1fr) 3.2em;gap:8px;align-items:center;font:400 .85rem var(--mono)}
+.wbar .t{height:10px;border-radius:5px;background:var(--rule);overflow:hidden}
+.wbar .t i{display:block;height:100%;border-radius:5px}
+.wbar span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.ladder{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+.ladder li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:8px;align-items:start}
+.ladder .mark{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:600 .8rem var(--mono);border:1.5px solid var(--rule);color:var(--muted)}
+.ladder .ok .mark{background:var(--a);border-color:var(--a);color:var(--card)}
+.ladder .no .mark{background:transparent;border-color:var(--f);color:var(--f)}
+.ladder .wait .mark{border-style:dashed}
+.ladder small{display:block;color:var(--muted);font:400 .8rem var(--mono)}
+.verdict{border-radius:10px;padding:12px 14px;background:var(--accent-soft)}
+.verdict b{font-weight:600}
+.tomorrow{display:flex;gap:18px;flex-wrap:wrap;font:500 1rem var(--mono);font-variant-numeric:tabular-nums}
+.tomorrow div{display:flex;flex-direction:column}
+.tomorrow small{font:400 .68rem var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tomorrow b{font:700 1.9rem/1 var(--display)}
+@media (max-width:720px){.labgrid{grid-template-columns:1fr}}
 @media (max-width:560px){.row{grid-template-columns:40px minmax(0,1fr)}.row .nums{grid-column:2;justify-content:flex-start;text-align:left}.row .nums div{align-items:flex-start}}
 </style>
 </head>
@@ -134,6 +167,35 @@ footer a{color:var(--accent)}
     </div>
   </section>
 
+  <section id="labSec" hidden>
+    <span class="kicker">Evolution Lab</span>
+    <h2>Evolve a better forecast</h2>
+    <p class="lede" style="margin-top:6px">Each creature below is a recipe for blending the models: how much to trust each one, plus a correction for their usual miss. Creatures practice on the first part of the month, the most accurate breed, and their offspring mutate. Then the champion sits an exam on days it never saw.</p>
+    <div class="lab" style="margin-top:14px">
+      <div class="labbar">
+        <div class="labstats">
+          <div><small>Generation</small><span id="lGen">0</span></div>
+          <div><small>Champion's miss</small><span id="lBest">—</span></div>
+          <div><small>Best single model</small><span id="lBase">—</span></div>
+          <div><small>Families left</small><span id="lFam">—</span></div>
+        </div>
+        <div class="labctl">
+          <button type="button" id="lPlay" class="ghost">Pause</button>
+          <button type="button" id="lAgain">Evolve again</button>
+          <label for="lMut">Mutation <select id="lMut"><option value="0.5">Low</option><option value="1" selected>Medium</option><option value="2">High</option></select></label>
+        </div>
+      </div>
+      <canvas id="pop" width="840" height="300" aria-label="The population of forecast recipes, best first. Each petal is one model; longer petals mean more trust."></canvas>
+      <div class="labgrid">
+        <div style="min-width:0">
+          <div id="evoChart"></div>
+          <div class="legend" id="evoLegend"></div>
+        </div>
+        <div class="champ" id="champ"></div>
+      </div>
+    </div>
+  </section>
+
   <section>
     <h2>Highs, forecast vs. reality</h2>
     <div class="chartbox"><div id="chart"></div>
@@ -152,6 +214,7 @@ footer a{color:var(--accent)}
     <p><b>What gets graded.</b> For each of the last 30 full days, we take what each model predicted the day's high and low would be 1, 2 and 3 days beforehand, and whether it predicted rain.</p>
     <p><b>What it's graded against.</b> Every model is compared with the same reference: Open-Meteo's historical weather record for that spot, the standard best estimate of what actually happened. Grading each model against its own later runs would let it mark its own homework.</p>
     <p><b>The grade.</b> The letter is the average miss on the high and low one day ahead: A under 2°F (1.1°C), B under 3°F, C under 4°F, D under 5°F, F at 5°F or more. Rain is scored as the share of days the model correctly called wet (1 mm or more) or dry.</p>
+    <p><b>The Evolution Lab.</b> A genetic algorithm evolves 48 blending recipes for 60 generations. Each recipe gives every model a share of trust and adds a correction to the high and low. Recipes are scored only on the first two-thirds of the month (practice). The last third is kept sealed as an exam, and the champion counts as trusted only if it beats the best single model there and the 90% range of its improvement stays above zero.</p>
     <p><b>Limits.</b> The reference is itself a model-based estimate for a grid square, not your backyard thermometer, and it is built partly from European (ECMWF) data, which may slightly favor the ECMWF model. Thirty days is one season's worth of weather, not a permanent verdict, so grades can change as the weather does.</p>
   </section>
 
@@ -249,11 +312,11 @@ async function getJSON(url){
   return j;
 }
 async function fetchAll(lat, lon, unit){
-  const vars = [];
+  const vars = ["temperature_2m"];   // the latest run, for tomorrow's evolved forecast
   for (const k of LEADS){ vars.push(`temperature_2m_previous_day${k}`, `precipitation_previous_day${k}`); }
   const u = unit==="C" ? "celsius" : "fahrenheit";
   const prevURL = `https://previous-runs-api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}`+
-    `&hourly=${vars.join(",")}&models=${MODELS.map(m=>m.id).join(",")}&past_days=${DAYS+2}&forecast_days=1&temperature_unit=${u}&timezone=auto`;
+    `&hourly=${vars.join(",")}&models=${MODELS.map(m=>m.id).join(",")}&past_days=${DAYS+2}&forecast_days=2&temperature_unit=${u}&timezone=auto`;
   const prev = await getJSON(prevURL);
   const dates = windowDates(prev.utc_offset_seconds||0);
   const truthURL = `https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}`+
@@ -368,19 +431,203 @@ async function run(){
   $("pname").textContent = placeLabel(p);
   $("pmeta").className = "meta"; $("pmeta").textContent = "Grading the last 30 days…";
   $("rows").innerHTML = '<div class="skeleton"></div><div class="skeleton" style="margin-top:8px"></div><div class="skeleton" style="margin-top:8px"></div>';
-  $("winnerBox").replaceChildren();
+  $("winnerBox").replaceChildren(); stopLab(); $("labSec").hidden = true;
   try{
     const {prev, truth, dates} = await fetchAll(p.latitude.toFixed(3), p.longitude.toFixed(3), state.unit);
     const sc = scoreModels(prev, truth, dates, state.unit==="C");
     $("pmeta").textContent = `${dates[0]} to ${dates[dates.length-1]} · ${sc.results.length} models graded · ${p.latitude.toFixed(2)}, ${p.longitude.toFixed(2)}`;
     $("gradeNote").textContent = `Average miss on the daily high and low, forecast one day ahead, in ${state.unit==="C"?"°C":"°F"}.`;
     render(sc, dates);
+    try{ startLab(prev, truth, dates, sc); }catch(err){ stopLab(); $("labSec").hidden = true; }   // the lab must never break the grades
   }catch(e){
     $("pmeta").className = "meta status err";
     $("pmeta").textContent = (e && e.message) ? e.message : "Couldn't reach the weather service. Check your connection and try again.";
     $("rows").replaceChildren();
   }
 }
+
+// ---------- evolution lab ----------
+// A recipe ("creature") gives each model a trust score, turned into shares that add up to 100%,
+// plus a correction added to the blended high and low. Evolution searches for the recipe with the smallest miss.
+function softmax(w){ const m=Math.max(...w); const e=w.map(x=>Math.exp(x-m)); const s=e.reduce((a,b)=>a+b,0); return e.map(x=>x/s); }
+function predict(g, r){ const p=softmax(g.w); let h=g.bh, l=g.bl; for (let i=0;i<p.length;i++){ h+=p[i]*r.fMax[i]; l+=p[i]*r.fMin[i]; } return [h,l]; }
+function dayErrors(g, rows){ return rows.map(r=>{ const [h,l]=predict(g,r); return (Math.abs(h-r.tMax)+Math.abs(l-r.tMin))/2; }); }
+function mae(g, rows){ if (!rows.length) return null; const e=dayErrors(g,rows); return e.reduce((a,b)=>a+b,0)/e.length; }
+const singleModel = (i,n) => ({w:Array.from({length:n},(_,k)=>k===i?40:0), bh:0, bl:0});
+const average = n => ({w:Array(n).fill(0), bh:0, bl:0});
+function makeRng(seed){ let s=(seed>>>0)||1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }
+function gauss(rnd){ let u=0; while(!u) u=rnd(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*rnd()); }
+function hashSeed(str){ let h=2166136261; for (const ch of str){ h^=ch.charCodeAt(0); h=Math.imul(h,16777619); } return (h>>>0)||1; }
+// The 90% range of (baseline miss − champion miss) on exam days, found by resampling the days.
+function bootstrapGain(champ, base, rows, rnd, n=2000){
+  const a=dayErrors(base,rows), b=dayErrors(champ,rows), d=a.map((x,i)=>x-b[i]), out=[];
+  for (let k=0;k<n;k++){ let s=0; for (let j=0;j<d.length;j++) s+=d[Math.floor(rnd()*d.length)]; out.push(s/d.length); }
+  out.sort((x,y)=>x-y);
+  return {mean:d.reduce((x,y)=>x+y,0)/d.length, lo:out[Math.floor(n*0.05)], hi:out[Math.floor(n*0.95)]};
+}
+function buildDataset(prev, truth, dates, results){
+  const H=prev.hourly, times=H.time;
+  const T={}; truth.daily.time.forEach((d,i)=>{ T[d]={max:truth.daily.temperature_2m_max[i], min:truth.daily.temperature_2m_min[i]}; });
+  const all=results.map(r=>({model:r.model, days:dailyFromHourly(times, H[`temperature_2m_previous_day1_${r.model.id}`])}));
+  // Keep models with a forecast on at least 80% of the days, so one patchy model can't shrink the data.
+  const keep=all.filter(x=>dates.filter(d=>x.days[d] && x.days[d].n>=20).length >= 0.8*dates.length);
+  const rows=[];
+  for (const d of dates){
+    const t=T[d]; if (!t || t.max==null || t.min==null) continue;
+    const f=keep.map(x=>x.days[d]); if (f.some(x=>!x || x.n<20)) continue;
+    rows.push({d, tMax:t.max, tMin:t.min, fMax:f.map(x=>x.max), fMin:f.map(x=>x.min)});
+  }
+  const tm=new Date(dates[dates.length-1]+"T12:00:00Z"); tm.setUTCDate(tm.getUTCDate()+2); const tomorrow=isoDate(tm);
+  const cur=keep.map(x=>dailyFromHourly(times, H[`temperature_2m_${x.model.id}`])[tomorrow]);
+  const next = cur.every(c=>c && c.n>=20) ? {d:tomorrow, fMax:cur.map(c=>c.max), fMin:cur.map(c=>c.min)} : null;
+  return {models:keep.map(x=>x.model), rows, next};
+}
+// Genetic algorithm: tournament selection, uniform crossover, Gaussian mutation, the two best carried over.
+function evolve(data, opts={}){
+  const n=data.models.length, rnd=makeRng(opts.seed||1), N=opts.pop||48, mut=opts.mut||1, unit=opts.unitScale||1;
+  const cut=Math.max(4, Math.round(data.rows.length*2/3)), train=data.rows.slice(0,cut), exam=data.rows.slice(cut);
+  let nextId=0, gen=0;
+  const born=(g,fam,parents)=>({id:nextId++, w:g.w, bh:g.bh, bl:g.bl, fam, gen, parents});
+  let pop=Array.from({length:N},(_,i)=>born({w:Array.from({length:n},()=>gauss(rnd)), bh:gauss(rnd)*unit, bl:gauss(rnd)*unit}, i, []));
+  const score=()=>{ for (const c of pop) c.err=mae(c,train); pop.sort((a,b)=>a.err-b.err); };
+  const note=()=>history.push({gen, best:pop[0].err, avg:pop.reduce((s,c)=>s+c.err,0)/N, fams:new Set(pop.map(c=>c.fam)).size});
+  const history=[]; score(); note();
+  const pick=()=>{ let b=null; for (let k=0;k<3;k++){ const c=pop[Math.floor(rnd()*N)]; if (!b || c.err<b.err) b=c; } return b; };
+  const jit=(x,s)=>rnd()<0.3 ? x+gauss(rnd)*s : x;
+  function step(){
+    gen++;
+    const next=pop.slice(0,2).map(c=>({...c}));
+    while (next.length<N){
+      const a=pick(), b=pick(), [p,q]=a.err<=b.err?[a,b]:[b,a];
+      next.push(born({w:p.w.map((x,i)=>jit(rnd()<0.5?x:q.w[i], 0.4*mut)),
+                      bh:jit(rnd()<0.5?p.bh:q.bh, 0.3*mut*unit), bl:jit(rnd()<0.5?p.bl:q.bl, 0.3*mut*unit)}, p.fam, [p.id,q.id]));
+    }
+    pop=next; score(); note();
+  }
+  return {train, exam, history, step, get pop(){ return pop; }, get gen(){ return gen; }};
+}
+function judge(E, data){
+  const n=data.models.length, champ=E.pop[0];
+  const singles=data.models.map((m,i)=>({i, m, train:mae(singleModel(i,n),E.train), exam:mae(singleModel(i,n),E.exam)}));
+  const best=singles.slice().sort((a,b)=>a.train-b.train)[0];   // chosen on practice days, the way a person would pick
+  const avg={train:mae(average(n),E.train), exam:mae(average(n),E.exam)};
+  const ce={train:champ.err, exam:mae(champ,E.exam)};
+  const gain=E.exam.length>=3 ? bootstrapGain(champ, singleModel(best.i,n), E.exam, makeRng(7)) : null;
+  return {champ, best, avg, ce, gain, steps:[ce.train<avg.train, ce.train<best.train, ce.exam<best.exam, !!gain && gain.lo>0]};
+}
+
+// ---------- evolution lab: drawing ----------
+const GENS=60;
+const colorOf = m => Math.max(0, MODELS.findIndex(x=>x.id===m.id)) % 7;   // each model keeps its colour in every town
+let lab=null;
+function stopLab(){ if (lab){ clearTimeout(lab.t); cancelAnimationFrame(lab.raf); lab=null; } }
+function tok(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+function startLab(prev, truth, dates, sc, rerun){
+  stopLab();
+  const data=buildDataset(prev, truth, dates, sc.results);
+  if (data.models.length<2 || data.rows.length<12){ $("labSec").hidden=true; return; }
+  $("labSec").hidden=false;
+  const runs = rerun ? rerun : 1;
+  const seed = runs===1 ? hashSeed(`${state.place.latitude},${state.place.longitude},${dates[dates.length-1]}`) : Math.floor(Math.random()*4e9)+1;
+  const E=evolve(data, {seed, mut:+$("lMut").value, unitScale: state.unit==="C" ? 0.56 : 1});
+  const n=data.models.length;
+  lab={E, data, runs, args:[prev,truth,dates,sc], paused:false, done:false,
+       base:Math.min(...data.models.map((m,i)=>mae(singleModel(i,n),E.train))), avgTrain:mae(average(n),E.train)};
+  $("lBase").textContent=deg(lab.base); $("lPlay").textContent="Pause"; $("lPlay").disabled=false;
+  $("champ").replaceChildren(el("p",{class:"status"},`Evolving on ${E.train.length} practice days. The last ${E.exam.length} days stay sealed for the exam.`));
+  const me=lab;
+  const tick=()=>{ if (lab!==me) return;
+    if (!me.paused){ E.step(); drawLab(); if (E.gen>=GENS){ finishLab(); return; } }
+    me.t=setTimeout(()=>{ me.raf=requestAnimationFrame(tick); }, 110); };
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches){ while (E.gen<GENS) E.step(); drawLab(); finishLab(); }
+  else { drawLab(); me.t=setTimeout(()=>{ me.raf=requestAnimationFrame(tick); }, 500); }
+}
+function drawLab(){
+  if (!lab) return; const {E, data}=lab, pop=E.pop, h=E.history[E.history.length-1];
+  $("lGen").textContent=`${E.gen} / ${GENS}`; $("lBest").textContent=deg(pop[0].err); $("lFam").textContent=`${h.fams} of ${pop.length}`;
+  // population: best first, petals sized by each model's share of trust
+  const cv=$("pop"), dpr=window.devicePixelRatio||1, cssW=Math.max(300, cv.parentElement.clientWidth-36);
+  const cols=cssW<520?8:12, cell=cssW/cols, rows=Math.ceil(pop.length/cols), cssH=rows*cell*1.2+4;
+  cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr); cv.style.aspectRatio=`${cssW} / ${cssH}`;
+  const g=cv.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,cssW,cssH);
+  const cols7=["--m1","--m2","--m3","--m4","--m5","--m6","--m7"].map(tok), ink=tok("--ink"), muted=tok("--muted"), accent=tok("--accent"), mono=tok("--mono")||"monospace";
+  const n=data.models.length;
+  pop.forEach((c,k)=>{
+    const cx=(k%cols+0.5)*cell, cy=(Math.floor(k/cols)+0.42)*cell*1.2, R=cell*0.34, p=softmax(c.w), mx=Math.max(...p);
+    g.globalAlpha=0.3+0.7*(1-k/pop.length);
+    p.forEach((v,i)=>{ const a=-Math.PI/2+i*2*Math.PI/n, L=R*(0.18+0.82*v/mx);
+      g.save(); g.translate(cx+Math.cos(a)*L/2, cy+Math.sin(a)*L/2); g.rotate(a); g.beginPath(); g.ellipse(0,0,L/2,R*0.17,0,0,Math.PI*2); g.fillStyle=cols7[colorOf(data.models[i])]; g.fill(); g.restore(); });
+    g.beginPath(); g.arc(cx,cy,R*0.15,0,Math.PI*2); g.fillStyle=ink; g.fill();
+    if (k===0){ g.globalAlpha=1; g.beginPath(); g.arc(cx,cy,R*1.12,0,Math.PI*2); g.strokeStyle=accent; g.lineWidth=2; g.stroke(); }
+    g.globalAlpha=k===0?1:0.85; g.fillStyle=k===0?accent:muted; g.font=`${Math.max(9,Math.min(12,cell*0.17))}px ${mono}`; g.textAlign="center";
+    g.fillText(c.err.toFixed(1)+"°", cx, cy+R*1.12+Math.max(10,cell*0.16));
+  });
+  g.globalAlpha=1;
+  drawEvoChart();
+}
+function drawEvoChart(){
+  const {E}=lab, hs=E.history, box=$("evoChart"), W=Math.max(300, Math.round(box.clientWidth||520)), H=200, P={l:40,r:10,t:10,b:26};
+  const vals=hs.flatMap(x=>[x.best,x.avg]).concat([lab.base, lab.avgTrain]);
+  let hi=Math.max(...vals), lo=Math.min(...vals); const pad=(hi-lo)*0.08||0.5; hi+=pad; lo=Math.max(0,lo-pad);
+  const x=i=>P.l+i*(W-P.l-P.r)/GENS, y=v=>P.t+(hi-v)*(H-P.t-P.b)/(hi-lo);
+  const NS="http://www.w3.org/2000/svg", mk=(t,a)=>{ const e=document.createElementNS(NS,t); for (const k in a) e.setAttribute(k,a[k]); return e; };
+  const svg=mk("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":`Champion's practice-day miss by generation, from ${deg(hs[0].best)} to ${deg(hs[hs.length-1].best)}.`});
+  const ticks=4; for (let k=0;k<=ticks;k++){ const v=lo+(hi-lo)*k/ticks;
+    svg.append(mk("line",{x1:P.l,x2:W-P.r,y1:y(v),y2:y(v),stroke:"var(--rule)"}));
+    const t=mk("text",{x:P.l-6,y:y(v)+4,"text-anchor":"end","font-size":11,"font-family":"var(--mono)",fill:"var(--muted)"}); t.textContent=v.toFixed(1)+"°"; svg.append(t); }
+  [0,20,40,60].forEach(gv=>{ const t=mk("text",{x:x(gv),y:H-8,"text-anchor":gv===0?"start":gv===60?"end":"middle","font-size":11,"font-family":"var(--mono)",fill:"var(--muted)"}); t.textContent=gv===0?"Gen 0":String(gv); svg.append(t); });
+  const hl=(v,dash,color)=>svg.append(mk("line",{x1:P.l,x2:W-P.r,y1:y(v),y2:y(v),stroke:color,"stroke-width":1.5,"stroke-dasharray":dash}));
+  hl(lab.avgTrain,"2 4","var(--muted)"); hl(lab.base,"6 4","var(--line-worst)");
+  const line=(key,color,w)=>svg.append(mk("path",{d:hs.map((h,i)=>(i?"L":"M")+x(h.gen).toFixed(1)+" "+y(h[key]).toFixed(1)).join(" "),fill:"none",stroke:color,"stroke-width":w,"stroke-linejoin":"round"}));
+  line("avg","var(--muted)",1.5); line("best","var(--accent)",2.5);
+  const last=hs[hs.length-1]; svg.append(mk("circle",{cx:x(last.gen),cy:y(last.best),r:4,fill:"var(--accent)"}));
+  box.replaceChildren(svg);
+  const lg=$("evoLegend"); if (!lg.childElementCount){
+    const item=(c,t,dash)=>{ const s=el("span"), i=el("i"); i.style.background=dash?`repeating-linear-gradient(90deg,${c} 0 ${dash}px,transparent ${dash}px ${dash+4}px)`:c; s.append(i, document.createTextNode(t)); lg.append(s); };
+    item("var(--accent)","Champion"); item("var(--muted)","Population average"); item("var(--line-worst)","Best single model",6); item("var(--muted)","Plain average of models",2);
+  }
+}
+function finishLab(){
+  const L=lab; if (!L) return; L.done=true; $("lPlay").disabled=true;
+  const {E, data}=L, J=judge(E, data), n=data.models.length, p=softmax(J.champ.w), U=state.unit==="C"?"C":"F";
+  const sign=v=>(v>=0?"+":"−")+Math.abs(v).toFixed(1)+"°";
+  const box=$("champ"); box.replaceChildren();
+  box.append(el("b",{},"The champion's recipe"));
+  const order=p.map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]);
+  for (const [v,i] of order){ const r=el("div",{class:"wbar"}), t=el("div",{class:"t"}), f=el("i"); f.style.width=(v*100).toFixed(1)+"%"; f.style.background=`var(--m${colorOf(data.models[i])+1})`;
+    t.append(f); r.append(el("span",{},data.models[i].name), t, el("span",{},Math.round(v*100)+"%")); box.append(r); }
+  box.append(el("p",{class:"status",style:"margin:0"},`Correction: ${sign(J.champ.bh)} on highs, ${sign(J.champ.bl)} on lows.`));
+  const lad=el("ol",{class:"ladder","aria-label":"Trust ladder"});
+  const stepRow=(ok,title,detail)=>{ const li=el("li",{class:ok?"ok":"no"}); li.append(el("span",{class:"mark","aria-hidden":"true"},ok?"✓":"✕")); const d=el("div"); d.append(document.createTextNode(title)); d.append(el("small",{},detail)); li.append(d); lad.append(li); };
+  stepRow(J.steps[0],"Beats the plain average of all models on practice days",`${deg(J.ce.train)} vs ${deg(J.avg.train)}`);
+  stepRow(J.steps[1],`Beats the best single model (${J.best.m.name}) on practice days`,`${deg(J.ce.train)} vs ${deg(J.best.train)}`);
+  stepRow(J.steps[2],`Beats ${J.best.m.name} on ${E.exam.length} exam days it never saw`,`${deg(J.ce.exam)} vs ${deg(J.best.exam)}`);
+  stepRow(J.steps[3],"The improvement holds up, not just luck",J.gain?`90% range of the gain: ${sign(J.gain.lo)} to ${sign(J.gain.hi)}`:"Not enough exam days to tell");
+  box.append(lad);
+  const trusted=J.steps.every(Boolean), place=state.place.name;
+  const v=el("div",{class:"verdict"});
+  if (trusted) v.append(el("b",{},"Trusted. "), document.createTextNode(`On days it never saw, the evolved recipe beat ${J.best.m.name} by ${J.gain.mean.toFixed(1)}° on average in ${place}.`));
+  else { const k=J.steps.indexOf(false);
+    v.append(el("b",{},"Not trusted yet. "), document.createTextNode(k<2 ? "Evolution couldn't improve on the plain models here this month."
+      : k===2 ? `It looked better in practice but lost to ${J.best.m.name} on the exam, a sign it learned this month's quirks instead of something real.`
+      : `It won the exam, but by too little to rule out luck with only ${E.exam.length} exam days.`)); }
+  if (L.runs>1) v.append(el("small",{style:"display:block;margin-top:6px;color:var(--muted)"},`Rerun ${L.runs}. The first run each day is the official one: rerunning until one passes would be grading on a curve.`));
+  box.append(v);
+  if (data.next){
+    const [eh,el_]=predict(J.champ, data.next), bi=J.best.i, d=new Date(data.next.d+"T12:00:00Z").toLocaleDateString("en-US",{weekday:"long",month:"short",day:"numeric",timeZone:"UTC"});
+    const tw=el("div",{class:"tomorrow"});
+    const col=(label,h,l)=>{ const c=el("div"); c.append(el("small",{},label), el("b",{},`${Math.round(h)}° / ${Math.round(l)}°`)); return c; };
+    tw.append(col("Evolved recipe", eh, el_), col(J.best.m.name, data.next.fMax[bi], data.next.fMin[bi]));
+    box.append(el("b",{},`Tomorrow, ${d}: high / low °${U}`), tw);
+    if (!trusted) box.append(el("p",{class:"status",style:"margin:0"},"Shown side by side for comparison. The recipe hasn't earned trust here yet."));
+  }
+}
+$("lPlay").addEventListener("click",()=>{ if (!lab || lab.done) return; lab.paused=!lab.paused; $("lPlay").textContent=lab.paused?"Resume":"Pause"; });
+$("lAgain").addEventListener("click",()=>{ if (!lab) return; const a=lab.args, r=lab.runs+1; $("evoLegend").replaceChildren(); startLab(...a, r); });
+$("lMut").addEventListener("change",()=>{ if (lab){ const a=lab.args, r=lab.runs+1; startLab(...a, r); } });
+let labResize=null; addEventListener("resize",()=>{ clearTimeout(labResize); labResize=setTimeout(()=>{ if (lab) drawLab(); }, 150); });
+matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",()=>{ if (lab) drawLab(); });
+
 
 // search + suggestions
 let sugTimer=null, lastSug=[];
@@ -412,7 +659,7 @@ $("uF").addEventListener("click", ()=>setUnit("F"));
 $("uC").addEventListener("click", ()=>setUnit("C"));
 $("uF").setAttribute("aria-pressed", state.unit==="F"); $("uC").setAttribute("aria-pressed", state.unit==="C");
 
-if (typeof module !== "undefined") { module.exports = {scoreModels, dailyFromHourly, gradeFor, windowDates, MODELS}; }
+if (typeof module !== "undefined") { module.exports = {scoreModels, dailyFromHourly, gradeFor, windowDates, MODELS, buildDataset, evolve, mae, singleModel, average, bootstrapGain}; }
 else run();
 </script>
 </body>
